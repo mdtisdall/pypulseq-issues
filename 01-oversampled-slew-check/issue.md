@@ -1,6 +1,6 @@
 # make_arbitrary_grad(oversampling=True) checks the slew rate 4× too leniently
 
-## Summary
+**Describe the bug**
 
 With `oversampling=True`, `make_arbitrary_grad` divides the sample differences by
 `2 * grad_raster_time`. The samples of an oversampled gradient are
@@ -10,21 +10,18 @@ of its real size.
 
 MATLAB Pulseq rejects the same gradient.
 
-## Versions
+**To Reproduce**
 
-- pypulseq 1.5.0.post1, and master at f2c582b (2026-08-28): same code.
-- For comparison: MATLAB Pulseq at c746912 (2026-09-17), run in GNU Octave 11.3.0.
-
-## Minimal example
+The bug is in one event, made with `make_arbitrary_grad`. No sequence is necessary.
 
 "Oversampled" here means `oversampling=True`. That is oversampling by a factor of 2, the
 only factor that pypulseq and MATLAB Pulseq support: one sample every
 `grad_raster_time / 2`, at `t = k * grad_raster_time / 2` for `k = 1 ... n`, with `n` odd,
 `first` at `t = 0` and `last` at `t = (n + 1) * grad_raster_time / 2`.
 
-The example is a triangle of 17 samples, from 0 to 15.75 mT/m and back, made with
-`make_arbitrary_grad`. Every segment rises or falls by 1.75 mT/m in 5 µs, that is
-350 T/m/s, or 350 % of `max_slew` = 100 T/m/s.
+The example is a triangle of 17 samples, from 0 to 15.75 mT/m and back. Every segment
+rises or falls by 1.75 mT/m in 5 µs, that is 350 T/m/s, or 350 % of `max_slew` =
+100 T/m/s.
 
 ```python
 import numpy as np
@@ -36,9 +33,11 @@ dt = system.grad_raster_time  # 10 us
 step = 3.5 * system.max_slew * dt / 2  # 350 % of max_slew over half a raster
 waveform = step * np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1])
 
+# the triangle starts and ends at 0
 g = pp.make_arbitrary_grad('x', waveform, first=0, last=0, oversampling=True, system=system)
 print('350 %: accepted (expected: ValueError, slew rate violation)')
 
+# The slope of each segment of the event, from its own tt, waveform, first and last.
 t = np.concatenate([[0], g.tt, [g.shape_dur]])
 amp = np.concatenate([[g.first], g.waveform, [g.last]])
 print(f'largest segment slope: {np.max(np.abs(np.diff(amp) / np.diff(t))) / system.max_slew:.2f} x max_slew')
@@ -57,7 +56,10 @@ largest segment slope: 3.50 x max_slew
 410 %: Slew rate violation 102.50000000000017
 ```
 
-Expected: a `ValueError` for the 350 % gradient, and "410" for the 410 % gradient.
+**Expected behavior**
+
+- The 350 % gradient: a `ValueError` (slew rate violation).
+- The 410 % gradient: a `ValueError` that reports 410, not 102.5.
 
 MATLAB Pulseq rejects the same gradient:
 
@@ -69,7 +71,22 @@ mr.makeArbitraryGrad('x', w, sys, 'oversampling', true, 'first', 0, 'last', 0);
 % error: Slew rate violation (350%)
 ```
 
-## Cause
+**Screenshots**
+
+Not applicable. The output is text (above).
+
+**Desktop (please complete the following information):**
+ - OS: macOS
+ - OS Version: 26.6.2
+ - `pypulseq` version: 1.5.0.post1, and master at f2c582b (2026-08-28). The code is the
+   same in both.
+ - Python 3.11.3, NumPy 2.4.6.
+ - For comparison: MATLAB Pulseq (`pulseq/pulseq`) at c746912 (2026-09-17), run in GNU
+   Octave 11.3.0.
+
+**Additional context**
+
+*Cause*
 
 [`make_arbitrary_grad.py`, lines 94-107](https://github.com/pulseq/pypulseq/blob/f2c582bae13145b8ac71958726bc8b5a14bd1cfd/src/pypulseq/make_arbitrary_grad.py#L94-L107):
 
@@ -95,7 +112,7 @@ With oversampling, every difference in `slew_rate` is over half a raster: betwee
 samples, from `first` (t = 0) to the first sample (t = dt/2), and from the last sample to
 `last` (t = shape_dur, dt/2 later).
 
-## Suggested fix
+*Suggested fix*
 
 ```diff
      if oversampling:
@@ -105,13 +122,6 @@ samples, from `first` (t = 0) to the first sample (t = dt/2), and from the last 
          post = last - waveform[-1]
 ```
 
-Tested on master (f2c582b) with this change:
-
-- The example raises `ValueError: Slew rate violation 349.99999999999994`.
-- `pytest tests` (run serially): 1262 passed and 2 failed, the same as without the
-  change. The 2 failures are `test_sigpy.py::test_slr` and `test_sms`, because sigpy is
-  not installed. No test in `tests/` makes an oversampled gradient.
-- No code inside pypulseq calls `make_arbitrary_grad` with `oversampling=True`, so the
-  change only affects user code that makes oversampled gradients.
+With this change, the example raises `ValueError: Slew rate violation 349.99999999999994`.
 
 A regression test could be the example above with `pytest.raises(ValueError)`.

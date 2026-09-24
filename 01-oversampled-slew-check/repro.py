@@ -12,6 +12,7 @@ dt = system.grad_raster_time  # 10 us
 step = 3.5 * system.max_slew * dt / 2
 waveform = step * np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1])
 
+# the triangle starts and ends at 0
 g = pp.make_arbitrary_grad('x', waveform, first=0, last=0, oversampling=True, system=system)
 print('350 %: accepted (expected: ValueError, slew rate violation)')
 
