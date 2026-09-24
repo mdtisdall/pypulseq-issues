@@ -8,7 +8,7 @@ test for the PR that follows the issue.
 
 | # | Issue | Status | Fix branch | Upstream |
 |---|---|---|---|---|
-| 01 | [`make_arbitrary_grad(oversampling=True)` checks the slew rate 4× too leniently](01-oversampled-slew-check/issue.md) | submitted | [`fix-oversampled-slew-check`](https://github.com/mdtisdall/pypulseq/tree/fix-oversampled-slew-check) | [#421](https://github.com/pulseq/pypulseq/issues/421) |
+| 01 | [`make_arbitrary_grad(oversampling=True)` checks the slew rate 4× too leniently](01-oversampled-slew-check/issue.md) | PR open | [`fix-oversampled-slew-check`](https://github.com/mdtisdall/pypulseq/tree/fix-oversampled-slew-check) | issue [#421](https://github.com/pulseq/pypulseq/issues/421), PR [#422](https://github.com/pulseq/pypulseq/pull/422) |
 | 02 | [Oversampled arbitrary gradients break in a Sequence: `get_block`, `check_timing`, `waveforms`, `write` and `read`](02-oversampled-sequence/issue.md) | draft | — | — |
 
 ## Layout
