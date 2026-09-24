@@ -1,0 +1,23 @@
+diff --git a/src/pypulseq/Sequence/sequence.py b/src/pypulseq/Sequence/sequence.py
+index 36311ca..cb41475 100644
+--- a/src/pypulseq/Sequence/sequence.py
++++ b/src/pypulseq/Sequence/sequence.py
+@@ -1654,6 +1654,18 @@ def waveforms(self, append_RF: bool = False, time_range: Union[List[float], None
+                             # TODO: Implement restoreAdditionalShapeSamples
+                             #       https://github.com/pulseq/pulseq/blob/master/matlab/%2Bmr/restoreAdditionalShapeSamples.m
+ 
++                            out_len[j] += len(grad.tt) + 2
++                            shape_pieces[j].append(
++                                np.array(
++                                    [
++                                        curr_dur
++                                        + grad.delay
++                                        + np.concatenate(([0], grad.tt, [grad.tt[-1] + self.grad_raster_time / 2])),
++                                        np.concatenate(([grad.first], grad.waveform, [grad.last])),
++                                    ]
++                                )
++                            )
++                        elif abs(tt_rast[0] - 1) < eps:  # Oversampled arbitrary gradient (first sample at half raster)
+                             out_len[j] += len(grad.tt) + 2
+                             shape_pieces[j].append(
+                                 np.array(
