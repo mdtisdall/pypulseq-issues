@@ -75,6 +75,8 @@ the branch for time shape ID -1 (oversampling by a factor of 2):
 [MATLAB's `getBlock`](https://github.com/pulseq/pulseq/blob/c7469123c2f381f065986e6cc3a7d09730ed16ef/matlab/%2Bmr/%40Sequence/Sequence.m#L1384-L1390)
 has `t_end=(length(g)+1)/2*obj.gradRasterTime`.
 
+*Suggested fix*
+
 ```diff
 -                    t_end = (len(g) + 1) * self.grad_raster_time
 +                    t_end = (len(g) + 1) * 0.5 * self.grad_raster_time
@@ -82,3 +84,5 @@ has `t_end=(length(g)+1)/2*obj.gradRasterTime`.
 
 With this change, the example prints `get_block shape_dur: 9e-05` and
 `check_timing: True []`.
+
+I will open a PR with this fix and a regression test.
