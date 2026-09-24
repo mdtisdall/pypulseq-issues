@@ -1,8 +1,9 @@
 # pypulseq-issues
 
 Draft issue reports for [pypulseq](https://github.com/pulseq/pypulseq), each with a
-minimal example and a tested fix. A draft is submitted to pypulseq by hand; the table
-records where it went. A fix branch, in the fork
+minimal example and a tested fix, and notes for [MATLAB Pulseq](https://github.com/pulseq/pulseq)
+(`pulseq/pulseq`) on questions that are not pypulseq bugs. A draft is submitted by hand;
+the table records where it went. A fix branch, in the fork
 [mdtisdall/pypulseq](https://github.com/mdtisdall/pypulseq), holds the fix and a regression
 test for the PR that follows the issue.
 
@@ -12,6 +13,7 @@ test for the PR that follows the issue.
 | 02 | [`get_block` returns oversampled arbitrary gradients with twice their `shape_dur`](02-oversampled-get-block/issue.md) | draft | — | — |
 | 03 | [`waveforms()` leaves out the first and last points of oversampled arbitrary gradients](03-oversampled-waveforms/issue.md) | draft | — | — |
 | 04 | [`write()` and `read()` fail with `KeyError: -1` for oversampled arbitrary gradients](04-oversampled-remove-duplicates/issue.md) | draft | — | — |
+| 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
 
 ## Layout
 
@@ -22,6 +24,9 @@ Each issue has its own folder:
 - `repro.py`: the minimal example of the report.
 - `fix.diff`: the suggested fix, against pypulseq master. Apply it in a pypulseq
   checkout with `git apply <path>/fix.diff`.
+
+A note for `pulseq/pulseq` has no `fix.diff`, and its example is `repro.m` (MATLAB), with
+`repro.py` as the same example in pypulseq.
 
 ## Running an example
 
