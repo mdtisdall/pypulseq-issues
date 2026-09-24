@@ -10,7 +10,7 @@ test for the PR that follows the issue.
 | # | Issue | Status | Fix branch | Upstream |
 |---|---|---|---|---|
 | 01 | [`make_arbitrary_grad(oversampling=True)` checks the slew rate 4× too leniently](01-oversampled-slew-check/issue.md) | PR open | [`fix-oversampled-slew-check`](https://github.com/mdtisdall/pypulseq/tree/fix-oversampled-slew-check) | issue [#421](https://github.com/pulseq/pypulseq/issues/421), PR [#422](https://github.com/pulseq/pypulseq/pull/422) |
-| 02 | [`get_block` returns oversampled arbitrary gradients with twice their `shape_dur`](02-oversampled-get-block/issue.md) | submitted | — | issue [#423](https://github.com/pulseq/pypulseq/issues/423) |
+| 02 | [`get_block` returns oversampled arbitrary gradients with twice their `shape_dur`](02-oversampled-get-block/issue.md) | submitted | [`fix-oversampled-get-block`](https://github.com/mdtisdall/pypulseq/tree/fix-oversampled-get-block) | issue [#423](https://github.com/pulseq/pypulseq/issues/423) |
 | 03 | [`waveforms()` leaves out the first and last points of oversampled arbitrary gradients](03-oversampled-waveforms/issue.md) | draft | — | — |
 | 04 | [`write()` and `read()` fail with `KeyError: -1` for oversampled arbitrary gradients](04-oversampled-remove-duplicates/issue.md) | draft | — | — |
 | 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
