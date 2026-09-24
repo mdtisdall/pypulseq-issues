@@ -125,3 +125,5 @@ samples, from `first` (t = 0) to the first sample (t = dt/2), and from the last 
 With this change, the example raises `ValueError: Slew rate violation 349.99999999999994`.
 
 A regression test could be the example above with `pytest.raises(ValueError)`.
+
+I will open a PR with this fix and a regression test.
