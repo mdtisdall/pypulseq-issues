@@ -82,7 +82,3 @@ has `t_end=(length(g)+1)/2*obj.gradRasterTime`.
 
 With this change, the example prints `get_block shape_dur: 9e-05` and
 `check_timing: True []`.
-
-Related: #421, and two other issues with oversampled arbitrary gradients in a `Sequence`:
-`waveforms()` leaves out their first and last points (#TODO), and `write()` and `read()`
-fail with `KeyError: -1` (#TODO).
