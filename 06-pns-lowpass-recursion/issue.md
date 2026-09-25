@@ -39,7 +39,7 @@ The full example, with the timing, is
 [`repro.py`](https://github.com/mdtisdall/pypulseq-issues/blob/main/06-pns-lowpass-recursion/repro.py).
 Results on an Apple M1 Max:
 
-| | 1.5.0.post1 | master f2c582b | master with the change below |
+| | 1.5.0.post1 | master [f2c582b](https://github.com/pulseq/pypulseq/commit/f2c582bae13145b8ac71958726bc8b5a14bd1cfd) | master with the change below |
 |---|---|---|---|
 | `safe_tau_lowpass`, 2 × 10⁶ samples | 4.48 s | 4.46 s | 0.009 s |
 | `lfilter`, the same samples | 0.008 s | 0.008 s | 0.009 s |
@@ -100,13 +100,17 @@ code myself and the change appears to be correct based on my review.
 
 The change does not reduce the memory. `calc_pns` keeps arrays of the whole sequence
 (the gradient samples, their differences, the padded copies and the PNS values): about
-1.4 GB for the 60 s example, and more for longer sequences. Because the recursion keeps
-one number of state for each filter, the model can also run on the sequence in chunks,
-with bounded memory. That is a separate change.
+1.4 GB for the 60 s example. The model could also run on the sequence in chunks with bounded memory, because the recursion keeps one number of state for each filter. That would be a larger change, and so is not considered here.
+
+The open PR #385 moves `utils/safe_pns_prediction.py` to `safety/pns/safe_pns.py`, and
+does not change `safe_tau_lowpass`. This change applies to the new file in the same way.
 
 Versions: macOS 26.6.2, Python 3.12.14, NumPy 2.5.3, SciPy 1.18.1; pypulseq 1.5.0.post1,
-and master at f2c582b (2026-08-28). `safe_pns_prediction.py` is the same in both. For
-comparison: `filip-szczepankiewicz/safe_pns_prediction` at 0774e80.
+and master at
+[f2c582b](https://github.com/pulseq/pypulseq/commit/f2c582bae13145b8ac71958726bc8b5a14bd1cfd)
+(2026-08-28). `safe_pns_prediction.py` is the same in both. For comparison:
+`filip-szczepankiewicz/safe_pns_prediction` at
+[0774e80](https://github.com/filip-szczepankiewicz/safe_pns_prediction/commit/0774e805ff6df9f81b36bb727519a6e696a4a000).
 
 I will open a PR with this change and a test that compares the recursion with the
 convolution, for each time constant of `safe_example_hw()` and in `safe_gwf_to_pns` on
