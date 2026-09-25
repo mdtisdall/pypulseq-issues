@@ -82,6 +82,12 @@ peak in the example. The whole test suite passes on master with the change.
 
 **Describe alternatives you've considered**
 
+- `scipy.signal.sosfilt`: the SciPy documentation prefers it to `lfilter` "for most
+  filtering tasks", because high-order filters in second-order sections have fewer
+  numerical problems. This filter is first order: `tf2sos` gives one section with the
+  same coefficients, and `sosfilt` gives the same values as `lfilter`, bit for bit, for
+  each time constant of `safe_example_hw()`. It takes about two times as long (0.015 s
+  instead of 0.008 s for the 2 × 10⁶ samples).
 - `scipy.signal.fftconvolve` with the same cut kernel: O(n log n) instead of O(n), and
   the kernel stays.
 - The loop of the MATLAB code in Python: slow in Python.
@@ -94,12 +100,9 @@ code myself and the change appears to be correct based on my review.
 
 The change does not reduce the memory. `calc_pns` keeps arrays of the whole sequence
 (the gradient samples, their differences, the padded copies and the PNS values): about
-1.4 GB for the 60 s example. In
-[pulseq-reports](https://github.com/mdtisdall/pulseq-reports), which calls
-`calculate_pns`, the PNS card of a 370 s protocol (39,304 blocks) took 257 s and 7.9 GB
-of added memory, and 5.4 s and 7.8 GB with this change. Because the recursion keeps one
-number of state for each filter, the model can also run on the sequence in chunks, with
-bounded memory. That is a separate change.
+1.4 GB for the 60 s example, and more for longer sequences. Because the recursion keeps
+one number of state for each filter, the model can also run on the sequence in chunks,
+with bounded memory. That is a separate change.
 
 Versions: macOS 26.6.2, Python 3.12.14, NumPy 2.5.3, SciPy 1.18.1; pypulseq 1.5.0.post1,
 and master at f2c582b (2026-08-28). `safe_pns_prediction.py` is the same in both. For
