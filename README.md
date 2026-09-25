@@ -14,6 +14,7 @@ test for the PR that follows the issue.
 | 03 | [`waveforms()` leaves out the first and last points of oversampled arbitrary gradients](03-oversampled-waveforms/issue.md) | draft | — | — |
 | 04 | [`write()` and `read()` fail with `KeyError: -1` for oversampled arbitrary gradients](04-oversampled-remove-duplicates/issue.md) | draft | — | — |
 | 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
+| 06 | [`calculate_pns` is slow for long sequences: compute the SAFE low-pass filter as a recursion](06-pns-lowpass-recursion/issue.md) | draft | — | — |
 
 ## Layout
 
@@ -56,6 +57,10 @@ uv run --no-project --with-editable <pypulseq checkout> python 01-oversampled-sl
 - pypulseq 1.5.0.post1, and master at `f2c582b` (2026-08-28).
 - For comparison with MATLAB Pulseq: `pulseq/pulseq` at `c746912` (2026-09-17), run in
   GNU Octave 11.3.0.
+- For comparison with the MATLAB SAFE model (06):
+  `filip-szczepankiewicz/safe_pns_prediction` at `0774e80`.
 
-The reports come from a comparison of the gradient slew computations in pypulseq and
-MATLAB Pulseq (September 2026).
+Reports 01 to 05 come from a comparison of the gradient slew computations in pypulseq and
+MATLAB Pulseq (September 2026). Report 06 comes from the work to make the PNS card of
+[pulseq-reports](https://github.com/mdtisdall/pulseq-reports) fast for long sequences
+(September 2026).
