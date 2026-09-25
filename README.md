@@ -15,6 +15,7 @@ test for the PR that follows the issue.
 | 04 | [`write()` and `read()` fail with `KeyError: -1` for oversampled arbitrary gradients](04-oversampled-remove-duplicates/issue.md) | draft | — | — |
 | 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
 | 06 | [Compute the SAFE low-pass filter in `calculate_pns` as a recursion](06-pns-lowpass-recursion/issue.md) | draft | — | — |
+| 07 | [Reduce the memory of `calculate_pns` by computing the SAFE model in chunks](07-pns-chunked-memory/issue.md) | draft | — | — |
 
 ## Layout
 
@@ -26,7 +27,8 @@ Each issue has its own folder:
 - `fix.diff`: the suggested fix, against pypulseq master. Apply it in a pypulseq
   checkout with `git apply <path>/fix.diff`.
 
-A note for `pulseq/pulseq` has no `fix.diff`, and its example is `repro.m` (MATLAB), with
+A feature request that is not implemented yet (07) has no `fix.diff`. A note for
+`pulseq/pulseq` has no `fix.diff`, and its example is `repro.m` (MATLAB), with
 `repro.py` as the same example in pypulseq.
 
 ## Running an example
@@ -61,6 +63,6 @@ uv run --no-project --with-editable <pypulseq checkout> python 01-oversampled-sl
   `filip-szczepankiewicz/safe_pns_prediction` at `0774e80`.
 
 Reports 01 to 05 come from a comparison of the gradient slew computations in pypulseq and
-MATLAB Pulseq (September 2026). Report 06 comes from the work to make the PNS card of
-[pulseq-reports](https://github.com/mdtisdall/pulseq-reports) fast for long sequences
+MATLAB Pulseq (September 2026). Reports 06 and 07 come from the work on the PNS card of
+[pulseq-reports](https://github.com/mdtisdall/pulseq-reports) for long sequences
 (September 2026).
