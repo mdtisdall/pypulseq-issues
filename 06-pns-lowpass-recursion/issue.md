@@ -121,7 +121,9 @@ code myself and the change appears to be correct based on my review.
 
 The change does not reduce the memory. `calc_pns` keeps arrays of the whole sequence
 (the gradient samples, their differences, the padded copies and the PNS values): about
-1.4 GB for the 60 s example. The model could also run on the sequence in chunks with bounded memory, because the recursion keeps one number of state for each filter. That would be a larger change, and so is not considered here.
+1.4 GB for the 60 s example. The model could also run on the sequence in chunks with
+bounded memory, leveraging the fact that the recursion keeps one number of state for
+each filter. That would be a larger change, and so is not considered here.
 
 The open PR #385 moves `utils/safe_pns_prediction.py` to `safety/pns/safe_pns.py`, and
 does not change `safe_tau_lowpass`. This change applies to the new file in the same way.
