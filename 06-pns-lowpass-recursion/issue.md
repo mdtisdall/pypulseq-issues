@@ -2,41 +2,62 @@
 
 **Is your feature request related to a problem? Please describe.**
 
-`Sequence.calculate_pns` takes about 40 s for each minute of sequence, so a PNS check of
-a real protocol takes minutes. Almost all of the time is in `safe_tau_lowpass`.
-`safe_pns_model` calls it three times for each axis, one time for each time constant. It
-filters with `np.convolve` and the kernel `(1 - alpha)^k`, cut where the kernel is below
-`eps = 1e-16`. On the 10 µs gradient raster, the kernels of `safe_example_hw()` have 128
-to 11,071 taps, so the filter costs up to 11,071 multiply-adds for each sample.
+On an Apple M1 Max, `Sequence.calculate_pns` takes about 40 s for each minute of
+sequence, so a PNS check of a real protocol takes minutes. Almost all of the time is in
+`safe_tau_lowpass`. `safe_pns_model` calls it three times for each axis, one time for
+each time constant. It filters with `np.convolve` and the kernel `(1 - alpha)^k`, cut
+where the kernel is below `eps = 1e-16`. On the 10 µs gradient raster, the kernels of
+`safe_example_hw()` have 128 to 11,071 taps, so the filter costs up to 11,071
+multiply-adds for each sample.
 
 The example filters 2 × 10⁶ random samples with the longest time constant (3 ms), with
-`safe_tau_lowpass` and with the recursion below, and then runs `calculate_pns` on a
-60 s sequence (a trapezoid on each axis every 10 ms):
+`safe_tau_lowpass` and with the recursion below. Then it runs `calculate_pns` on a 60 s
+sequence (a trapezoid on each axis every 10 ms), and prints the times and the peak
+memory:
 
 ```python
+import resource
+import sys
+import time
+
 import numpy as np
 import pypulseq as pp
 from pypulseq.utils.safe_pns_prediction import safe_example_hw, safe_tau_lowpass
 from scipy.signal import lfilter
 
-dt, tau = 0.01, 3.0  # ms, as safe_pns_model gives them to safe_tau_lowpass
+# One filter, 20 s of samples on the 10 us raster, with the longest time constant of
+# safe_example_hw(). safe_pns_model gives tau and dt to safe_tau_lowpass in ms.
+dt, tau = 0.01, 3.0
 alpha = dt / (tau + dt)
 x = np.random.default_rng(0).normal(size=2_000_000)
-y_pypulseq = safe_tau_lowpass(x, tau, dt)
-y_recursion = lfilter([alpha], [1.0, alpha - 1.0], x)
-print(np.max(np.abs(y_recursion - y_pypulseq)) / np.max(np.abs(y_pypulseq)))
 
+t0 = time.perf_counter()
+y_pypulseq = safe_tau_lowpass(x, tau, dt)
+t1 = time.perf_counter()
+y_recursion = lfilter([alpha], [1.0, alpha - 1.0], x)
+t2 = time.perf_counter()
+difference = np.max(np.abs(y_recursion - y_pypulseq)) / np.max(np.abs(y_pypulseq))
+print(f'safe_tau_lowpass: {t1 - t0:.3f} s')
+print(f'lfilter:          {t2 - t1:.3f} s')
+print(f'largest difference / peak: {difference:.1e}')
+
+# calculate_pns for a 60 s sequence: a trapezoid on each axis every 10 ms.
 system = pp.Opts(max_grad=28, grad_unit='mT/m', max_slew=150, slew_unit='T/m/s')
 grads = [pp.make_trapezoid(channel, area=1000, system=system) for channel in 'xyz']
 delay = pp.make_delay(10e-3)
 seq = pp.Sequence(system)
 for _ in range(6000):
     seq.add_block(*grads, delay)
+
+t0 = time.perf_counter()
 ok, pns_norm, _, _ = seq.calculate_pns(safe_example_hw(), do_plots=False)
+t1 = time.perf_counter()
+peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+peak_rss *= 1 if sys.platform == 'darwin' else 1024  # bytes on macOS, KiB on Linux
+print(f'calculate_pns, {seq.duration()[0]:.0f} s sequence: {t1 - t0:.1f} s, peak {pns_norm.max():.4f}')
+print(f'peak RSS of the process: {peak_rss / 1e9:.2f} GB')
 ```
 
-The full example, with the timing, is
-[`repro.py`](https://github.com/mdtisdall/pypulseq-issues/blob/main/06-pns-lowpass-recursion/repro.py).
 Results on an Apple M1 Max:
 
 | | 1.5.0.post1 | master [f2c582b](https://github.com/pulseq/pypulseq/commit/f2c582bae13145b8ac71958726bc8b5a14bd1cfd) | master with the change below |
