@@ -27,9 +27,11 @@ Each issue has its own folder:
 - `fix.diff`: the suggested fix, against pypulseq master. Apply it in a pypulseq
   checkout with `git apply <path>/fix.diff`.
 
-The `fix.diff` of 07 applies after the `fix.diff` of 06. A note for `pulseq/pulseq` has
-no `fix.diff`, and its example is `repro.m` (MATLAB), with `repro.py` as the same
-example in pypulseq.
+The `fix.diff` of 07 applies after the `fix.diff` of 06. 07 also has `plan.md`, the plan of
+the implementation, and `chunk_tradeoff.py`, which measures the time and the memory of
+`calculate_pns` for chunk sizes on one computer. `chunk_tradeoff_m1max.txt` is its output
+on an Apple M1 Max. A note for `pulseq/pulseq` has no `fix.diff`, and its example is
+`repro.m` (MATLAB), with `repro.py` as the same example in pypulseq.
 
 ## Running an example
 
