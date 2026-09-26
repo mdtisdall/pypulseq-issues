@@ -1,5 +1,5 @@
 diff --git a/src/pypulseq/Sequence/calc_pns.py b/src/pypulseq/Sequence/calc_pns.py
-index 23d2f58..196af4d 100644
+index 23d2f58..faaa2ef 100644
 --- a/src/pypulseq/Sequence/calc_pns.py
 +++ b/src/pypulseq/Sequence/calc_pns.py
 @@ -5,10 +5,13 @@
@@ -11,8 +11,8 @@ index 23d2f58..196af4d 100644
  from pypulseq.utils.siemens.asc_to_hw import asc_to_hw
  from pypulseq.utils.siemens.readasc import readasc
  
-+# Number of gradient raster samples processed per SAFE-model chunk (1 s on the 10 us raster).
-+_PNS_CHUNK_SAMPLES = 100_000
++# Number of gradient raster samples processed per SAFE-model chunk (0.3 s on the 10 us raster).
++_PNS_CHUNK_SAMPLES = 30_000
 +
  
  def calc_pns(

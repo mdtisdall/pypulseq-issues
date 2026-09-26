@@ -57,7 +57,7 @@ Results:
 
 | Sequence | Samples | Peak memory | Peak memory with the change below | Returned arrays |
 |---|---|---|---|---|
-| 60 s | 5,999,103 | 1.02 GB | 0.27 GB | 0.24 GB |
+| 60 s | 5,999,103 | 1.02 GB | 0.26 GB | 0.24 GB |
 | 120 s | 11,999,103 | 2.04 GB | 0.52 GB | 0.48 GB |
 
 The piece gives 2.220 at 500.205 ms, and the whole sequence gives 1.108.
@@ -70,11 +70,11 @@ zi=zi)`. It returns the PNS of the chunk and the state for the next chunk: the l
 gradient sample, and the final state of each of the nine filters. This needs the
 recursion of #XXX (compute the SAFE low-pass filter in calculate_pns as a recursion).
 
-Then `calc_pns` computes the model on chunks of 10⁵ samples (1 s on the 10 µs raster),
-and writes each chunk into the arrays that it returns:
+Then `calc_pns` computes the model on chunks of 30,000 samples (0.3 s on the 10 µs
+raster), and writes each chunk into the arrays that it returns:
 
 ```python
-_PNS_CHUNK_SAMPLES = 100_000
+_PNS_CHUNK_SAMPLES = 30_000
 ...
 n = t.shape[0]
 pns_comp = np.empty((n, 3))
@@ -97,11 +97,29 @@ the padding after the sequence from its result. The tests compare the chunked re
 with the whole-sequence computation for several sequences, with and without
 `time_range`, and with chunk sizes that put the chunk ends on gradient ramps.
 
-The peak memory is the returned arrays and one chunk: 0.27 GB instead of 1.02 GB for the
-60 s sequence. With chunks of 10⁴ samples it is 0.26 GB, and with 10⁶ samples 0.43 GB.
-The time does not change: about 0.6 s for the 60 s sequence on an Apple M1 Max, with and
-without the chunks. The arguments and the results of `calculate_pns` do not change.
-`safe_gwf_to_pns` and `safe_pns_model` stay for other callers.
+The peak memory is the returned arrays and one chunk: 0.26 GB instead of 1.02 GB for the
+60 s sequence. The time does not change: about 0.6 s for the 60 s sequence on an Apple
+M1 Max, with and without the chunks. The arguments and the results of `calculate_pns`
+do not change. `safe_gwf_to_pns` and `safe_pns_model` stay for other callers.
+
+The size of the chunks sets the balance between memory and time. For the 60 s sequence
+on an Apple M1 Max (the best of 3 runs, in one process after a first call):
+
+| Chunk (samples) | Chunks | Time | Peak memory |
+|---|---|---|---|
+| 1,000 | 6,000 | 1.01 s | 0.248 GB |
+| 3,000 | 2,000 | 0.71 s | 0.248 GB |
+| 10,000 | 600 | 0.57 s | 0.249 GB |
+| 30,000 | 200 | 0.53 s | 0.250 GB |
+| 100,000 | 60 | 0.53 s | 0.261 GB |
+| 1,000,000 | 6 | 0.54 s | 0.426 GB |
+| 5,999,103 (one chunk) | 1 | 0.53 s | 1.202 GB |
+
+Each chunk costs about 80 µs (the loop, the sampling of the gradients and nine `lfilter`
+calls), and each sample about 87 ns. So smaller chunks add time, about 9 % at 10,000
+samples. They do not decrease the memory below the returned arrays (0.24 GB) and about
+8 MB of other data. Chunks of 30,000 samples are within 2 MB of that minimum, at the
+time of one chunk.
 
 **Describe alternatives you've considered**
 
