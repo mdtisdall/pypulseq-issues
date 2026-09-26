@@ -14,7 +14,7 @@ test for the PR that follows the issue.
 | 03 | [`waveforms()` leaves out the first and last points of oversampled arbitrary gradients](03-oversampled-waveforms/issue.md) | draft | — | — |
 | 04 | [`write()` and `read()` fail with `KeyError: -1` for oversampled arbitrary gradients](04-oversampled-remove-duplicates/issue.md) | draft | — | — |
 | 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
-| 06 | [Compute the SAFE low-pass filter in `calculate_pns` as a recursion](06-pns-lowpass-recursion/issue.md) | draft | — | — |
+| 06 | [Compute the SAFE low-pass filter in `calculate_pns` as a recursion](06-pns-lowpass-recursion/issue.md) | draft | [`pns-lfilter`](https://github.com/mdtisdall/pypulseq/tree/pns-lfilter) | — |
 | 07 | [Reduce the memory of `calculate_pns` by computing the SAFE model in chunks](07-pns-chunked-memory/issue.md) | draft | — | — |
 
 ## Layout
