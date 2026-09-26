@@ -22,7 +22,7 @@ def make_seq(duration):  # a trapezoid on each axis every 10 ms
 
 
 # Peak memory of calculate_pns, and the size of the arrays that it returns.
-for duration in (15, 30, 60, 120):
+for duration in (60, 120):
     seq = make_seq(duration)
     tracemalloc.start()
     ok, pns_norm, pns_comp, t = seq.calculate_pns(hw, do_plots=False)

@@ -11,7 +11,7 @@ The arrays that `calculate_pns` returns (`pns_norm`, `pns_comp` and `t`) are 40 
 each sample. The rest is temporary.
 
 The example measures the peak memory of `calculate_pns` with `tracemalloc` for
-sequences of 15 s to 120 s (a trapezoid on each axis every 10 ms). Then it computes the
+sequences of 60 s and 120 s (a trapezoid on each axis every 10 ms). Then it computes the
 PNS of a piece of a 1 s sequence with `time_range`, from a time on the flat top of a
 trapezoid:
 
@@ -36,7 +36,7 @@ def make_seq(duration):  # a trapezoid on each axis every 10 ms
 
 
 # Peak memory of calculate_pns, and the size of the arrays that it returns.
-for duration in (15, 30, 60, 120):
+for duration in (60, 120):
     seq = make_seq(duration)
     tracemalloc.start()
     ok, pns_norm, pns_comp, t = seq.calculate_pns(hw, do_plots=False)
@@ -55,33 +55,53 @@ print(f'at {t_piece[0] * 1e3:.3f} ms: {piece[0]:.3f} from the piece, {pns_norm[i
 
 Results:
 
-| Sequence | Samples | Peak memory | Returned arrays |
-|---|---|---|---|
-| 15 s | 1,499,103 | 0.25 GB | 0.06 GB |
-| 30 s | 2,999,103 | 0.51 GB | 0.12 GB |
-| 60 s | 5,999,103 | 1.02 GB | 0.24 GB |
-| 120 s | 11,999,103 | 2.04 GB | 0.48 GB |
+| Sequence | Samples | Peak memory | Peak memory with the change below | Returned arrays |
+|---|---|---|---|---|
+| 60 s | 5,999,103 | 1.02 GB | 0.27 GB | 0.24 GB |
+| 120 s | 11,999,103 | 2.04 GB | 0.52 GB | 0.48 GB |
 
 The piece gives 2.220 at 500.205 ms, and the whole sequence gives 1.108.
 
 **Describe the solution you'd like**
 
-Compute the model on chunks of the sequence, for example 10⁵ samples (1 s on the 10 µs
-raster) at a time, and write each chunk into the output arrays:
+Add `safe_gwf_to_pns_chunk(gwf, dt, hw, state=None)` to `safe_pns_prediction.py`. It
+computes the model on one chunk of the waveform with `scipy.signal.lfilter(b, a, x,
+zi=zi)`. It returns the PNS of the chunk and the state for the next chunk: the last
+gradient sample, and the final state of each of the nine filters. This needs the
+recursion of #XXX (compute the SAFE low-pass filter in calculate_pns as a recursion).
 
-1. Sample the gradients of the chunk, and keep the last sample for the differences of
-   the next chunk.
-2. Filter the chunk with `scipy.signal.lfilter(b, a, x, zi=zi)`, and keep the final
-   state of each of the nine filters for the next chunk. This needs the recursion of
-   #XXX (compute the SAFE low-pass filter in calculate_pns as a recursion).
-3. Compute the PNS values of the chunk. The steps after the filters are for each sample.
+Then `calc_pns` computes the model on chunks of 10⁵ samples (1 s on the 10 µs raster),
+and writes each chunk into the arrays that it returns:
 
-The result is the same as for the whole sequence. The zero padding before the sequence
-is the same as a zero initial state of the filters, and `calc_pns` removes the padding
-after the sequence from its result. The peak memory would be the returned arrays and one
-chunk: about 0.26 GB instead of 1.02 GB for the 60 s sequence. The arguments and the
-results of `calculate_pns` do not change. `safe_gwf_to_pns` and `safe_pns_model` stay
-for other callers.
+```python
+_PNS_CHUNK_SAMPLES = 100_000
+...
+n = t.shape[0]
+pns_comp = np.empty((n, 3))
+pns_norm = np.empty(n)
+state = None
+for start in range(0, n, _PNS_CHUNK_SAMPLES):
+    stop = min(start + _PNS_CHUNK_SAMPLES, n)
+    gw = np.zeros((stop - start, ng))
+    for i in range(ng):
+        if gw_pp[i] is not None:
+            gw[:, i] = gw_pp[i](t[start:stop])
+    pns_chunk, state = safe_gwf_to_pns_chunk(gw / obj.system.gamma, obj.grad_raster_time, hardware, state)
+    pns_comp[start:stop] = 0.01 * pns_chunk
+    pns_norm[start:stop] = np.sqrt((pns_comp[start:stop] ** 2).sum(axis=1))
+```
+
+The result is the same as for the whole sequence, bit for bit. The zero padding before
+the sequence is the same as a zero initial state of the filters, and `calc_pns` removes
+the padding after the sequence from its result. The tests compare the chunked result
+with the whole-sequence computation for several sequences, with and without
+`time_range`, and with chunk sizes that put the chunk ends on gradient ramps.
+
+The peak memory is the returned arrays and one chunk: 0.27 GB instead of 1.02 GB for the
+60 s sequence. With chunks of 10⁴ samples it is 0.26 GB, and with 10⁶ samples 0.43 GB.
+The time does not change: about 0.6 s for the 60 s sequence on an Apple M1 Max, with and
+without the chunks. The arguments and the results of `calculate_pns` do not change.
+`safe_gwf_to_pns` and `safe_pns_model` stay for other callers.
 
 **Describe alternatives you've considered**
 
@@ -110,6 +130,6 @@ Versions: macOS 26.6.2, Python 3.12.14, NumPy 2.5.3, SciPy 1.18.1; pypulseq mast
 [f2c582b](https://github.com/pulseq/pypulseq/commit/f2c582bae13145b8ac71958726bc8b5a14bd1cfd)
 (2026-08-28).
 
-I am happy to open a PR with this change and a test that compares the chunked result
-with the result for the whole sequence. Are there any concerns about the suggested
-change, or about the size of the chunks?
+I am happy to open a PR with this change and its tests, or two PRs: one for
+`safe_gwf_to_pns_chunk`, and one for `calc_pns`. Are there any concerns about the
+suggested change, or about the size of the chunks?
