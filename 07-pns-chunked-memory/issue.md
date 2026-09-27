@@ -89,6 +89,7 @@ for start in range(0, n, _PNS_CHUNK_SAMPLES):
     pns_chunk, state = safe_gwf_to_pns_chunk(gw / obj.system.gamma, obj.grad_raster_time, hardware, state)
     pns_comp[start:stop] = 0.01 * pns_chunk
     pns_norm[start:stop] = np.sqrt((pns_comp[start:stop] ** 2).sum(axis=1))
+ok = bool(np.all(pns_norm < 1))
 ```
 
 The result is the same as for the whole sequence, bit for bit. The zero padding before
@@ -120,6 +121,14 @@ calls), and each sample about 87 ns. So smaller chunks add time, about 9 % at 10
 samples. They do not decrease the memory below the returned arrays (0.24 GB) and about
 8 MB of other data. Chunks of 30,000 samples are within 2 MB of that minimum, at the
 time of one chunk.
+
+`calc_pns` now also computes `ok` with `np.all(pns_norm < 1)` instead of the builtin
+`all`. The builtin reads `pns_norm < 1` one sample at a time, and it stops only at the
+first value of 1 or more. So a sequence that passes costs the most. For a 60 s sequence
+that passes (a trapezoid on x every 10 ms, peak 0.63), `calculate_pns` takes 0.41 s
+instead of 0.45 s on an Apple M1 Max (the median of 7 runs). For the 60 s sequence of
+the example, which fails at its first trapezoid, the time does not change. `ok` stays a
+Python `bool`, with the same value.
 
 **Describe alternatives you've considered**
 
