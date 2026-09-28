@@ -26,6 +26,8 @@ Each issue has its own folder:
 - `repro.py`: the minimal example of the report.
 - `fix.diff`: the suggested fix, against pypulseq master. Apply it in a pypulseq
   checkout with `git apply <path>/fix.diff`.
+- `pr.md`, where there is one: the PR description, ready to paste, with its title in
+  the first line.
 
 07 is merged into 06. Its folder keeps `plan.md`, the plan of the implementation, and
 `chunk_tradeoff.py`, which measures the time and the memory of `calculate_pns` for chunk
