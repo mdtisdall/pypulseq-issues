@@ -16,6 +16,7 @@ test for the PR that follows the issue.
 | 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
 | 06 | [Reduce the time and memory of `calculate_pns` for long sequences](06-pns-time-memory/issue.md) | draft | [`pns-chunked`](https://github.com/mdtisdall/pypulseq/tree/pns-chunked) | — |
 | 07 | Compute the SAFE model of `calculate_pns` in chunks ([plan](07-pns-chunked-memory/plan.md)) | merged into 06 | — | — |
+| 08 | [`add_block` stores an RF event with `use='other'` as undefined](08-rf-use-other/issue.md) | draft | — | — |
 
 ## Layout
 
