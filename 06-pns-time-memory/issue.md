@@ -17,11 +17,9 @@ are two causes:
    returns (`pns_norm`, `pns_comp` and `t`) are 40 bytes for each sample. The rest is
    temporary.
 
-The example filters 2 × 10⁶ random samples with the longest time constant (3 ms), with
-`safe_tau_lowpass` and with the recursion below. Then it runs `calculate_pns` on a 60 s
-sequence (a trapezoid on each axis every 10 ms), and measures the time and the peak
-memory. Last, it computes the PNS of a piece of a 1 s sequence with `time_range`, from a
-time on the flat top of a trapezoid:
+The example runs `calculate_pns` on a 60 s sequence (a trapezoid on each axis every
+10 ms), and measures the time and the peak memory. Then it computes the PNS of a piece of
+a 1 s sequence with `time_range`, from a time on the flat top of a trapezoid:
 
 ```python
 import time
@@ -29,20 +27,7 @@ import tracemalloc
 
 import numpy as np
 import pypulseq as pp
-from pypulseq.utils.safe_pns_prediction import safe_example_hw, safe_tau_lowpass
-from scipy.signal import lfilter
-
-# One filter, 20 s of samples on the 10 us raster, with the longest time constant of
-# safe_example_hw(). safe_pns_model gives tau and dt to safe_tau_lowpass in ms.
-dt, tau = 0.01, 3.0
-alpha = dt / (tau + dt)
-x = np.random.default_rng(0).normal(size=2_000_000)
-t0 = time.perf_counter()
-y_pypulseq = safe_tau_lowpass(x, tau, dt)
-t1 = time.perf_counter()
-y_recursion = lfilter([alpha], [1.0, alpha - 1.0], x)
-difference = np.max(np.abs(y_recursion - y_pypulseq)) / np.max(np.abs(y_pypulseq))
-print(f'safe_tau_lowpass: {t1 - t0:.3f} s, largest difference from the recursion / peak: {difference:.1e}')
+from pypulseq.utils.safe_pns_prediction import safe_example_hw
 
 # calculate_pns for a 60 s sequence: a trapezoid on each axis every 10 ms.
 system = pp.Opts(max_grad=28, grad_unit='mT/m', max_slew=150, slew_unit='T/m/s')
@@ -82,8 +67,6 @@ Results on an Apple M1 Max:
 
 | | master [f2c582b](https://github.com/pulseq/pypulseq/commit/f2c582bae13145b8ac71958726bc8b5a14bd1cfd) | with the recursion | with the recursion and the chunks |
 |---|---|---|---|
-| `safe_tau_lowpass`, 2 × 10⁶ samples | 4.49 s | 0.009 s | 0.009 s |
-| largest difference / peak | 1.6e-15 | 0 | 0 |
 | `calculate_pns`, 60 s sequence | 41.9 s | 0.7 s | 0.6 s |
 | peak of `pns_norm` | 1.2032 | 1.2032 | 1.2032 |
 | peak memory | 1.01 GB | 1.01 GB | 0.25 GB |
@@ -123,8 +106,8 @@ and pypulseq has no new public names.
    ```
 
    The values differ from the convolution only by float rounding and by the cut of the
-   kernel: at most 1.6e-15 of the peak in the example. `eps` has no effect after the
-   change. It stays so that callers do not break.
+   kernel, and the peak of `pns_norm` in the example does not change. `eps` has no
+   effect after the change. It stays so that callers do not break.
 
 2. Compute the model in chunks. A private function,
    `_safe_gwf_to_pns_chunk(gwf, dt, hw, state=None)`, computes the model on one chunk of
@@ -157,13 +140,8 @@ and pypulseq has no new public names.
    `calc_pns` removes the padding after the sequence from its result. The peak memory is
    the returned arrays and one chunk.
 
-   Each chunk costs about 80 µs and each sample about 87 ns on an Apple M1 Max. So
-   smaller chunks add time (about 9 % at 10,000 samples) without less memory, and larger
-   chunks add memory (0.43 GB at 10⁶ samples) without less time.
-
-   `ok` now uses `np.all` instead of the builtin `all`, which reads `pns_norm < 1` one
-   sample at a time when the sequence passes. For a 60 s sequence that passes (a
-   trapezoid on x every 10 ms), `calculate_pns` takes 0.41 s instead of 0.45 s.
+   Smaller chunks add time without saving memory, and larger chunks add memory without
+   saving time. 30,000 samples is near the minimum of both on an Apple M1 Max.
 
 **Describe alternatives you've considered**
 
@@ -172,15 +150,9 @@ and pypulseq has no new public names.
   numerical problems. This filter is first order: `tf2sos` gives one section with the
   same coefficients, and `sosfilt` gives the same values as `lfilter`, bit for bit, for
   each time constant of `safe_example_hw()`. It takes about two times as long.
-- `scipy.signal.fftconvolve` with the same cut kernel: O(n log n) instead of O(n), and
-  the kernel stays.
-- The loop of the MATLAB code in Python: slow in Python.
-- A new dependency, for example Numba: not necessary, because SciPy has `lfilter`.
 - Pieces with `time_range`, by the user: each piece starts the filters from zero, and
   the gradient at the start of the piece counts as a step from zero. In the example,
   this gives 2.220 instead of 1.108, a false failure.
-- `float32` arrays: half of the memory, but it still increases with the duration, and
-  the values change.
 - An argument that returns only `ok` and the peak of `pns_norm`: with chunks, the
   memory would then not depend on the duration. This changes what `calculate_pns`
   returns, so it could be a later option.
