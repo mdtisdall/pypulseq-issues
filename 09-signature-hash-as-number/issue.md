@@ -17,62 +17,35 @@ and
 
 **To Reproduce**
 
-The example does not edit a file by hand. It searches for a value of a definition that
-gives a digest of this kind, and then `write` signs the file itself, so the hash is
-correct for the file.
+The value of the definition `Nonce` gives a file whose digest is of this kind. It was
+found by trying `n-0`, `n-1`, and so on. `write` signs the file itself, so the hash is
+correct for the file; nothing is edited by hand.
 
 ```python
-import hashlib
 import os
 import tempfile
 
 import pypulseq as pp
 
-
-def is_float(text):
-    try:
-        float(text)
-    except ValueError:
-        return False
-    return True
-
-
 seq = pp.Sequence()
 seq.add_block(pp.make_delay(1e-3))
+seq.set_definition('Nonce', 'n-14723')
 
 with tempfile.TemporaryDirectory() as folder:
     path = os.path.join(folder, 'signed.seq')
-
-    # The text of the file up to [SIGNATURE] is the text of a write without a signature.
-    seq.set_definition('Nonce', 'n-PLACEHOLDER')
-    seq.write(path, create_signature=False)
-    with open(path) as f:
-        template = f.read()
-    nonce = next(
-        f'n-{k}'
-        for k in range(100_000_000)
-        if is_float(hashlib.md5(template.replace('n-PLACEHOLDER', f'n-{k}').encode()).hexdigest())
-    )
-
-    seq.set_definition('Nonce', nonce)
-    written = seq.write(path)  # pypulseq writes the [SIGNATURE] section
-    print('nonce:', nonce)
-    print('written hash:', repr(written))
-    with open(path) as f:
-        print('file says:   ', [line for line in f if line.startswith('Hash ')][0].strip())
-
+    written = seq.write(path)
     read_back = pp.Sequence()
     read_back.read(path)
-    print('read hash:   ', repr(read_back.signature_value), f'({type(read_back.signature_value).__name__})')
-    print('equal:', read_back.signature_value == written, '(expected: True)')
+
+print('written hash:', repr(written))
+print('read hash:   ', repr(read_back.signature_value), f'({type(read_back.signature_value).__name__})')
+print('equal:', read_back.signature_value == written, '(expected: True)')
 ```
 
 Output:
 
 ```
-nonce: n-14723
 written hash: '9731349875117297474679317e925476'
-file says:    Hash 9731349875117297474679317e925476
 read hash:    np.float64(inf) (float64)
 equal: False (expected: True)
 ```
