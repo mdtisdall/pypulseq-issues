@@ -2,10 +2,14 @@
 
 **Describe the bug**
 
-After `write`, `Sequence.signature_file` is `'text'`
-([`Sequence/sequence.py`, line 1867](https://github.com/pulseq/pypulseq/blob/f2c582bae13145b8ac71958726bc8b5a14bd1cfd/src/pypulseq/Sequence/sequence.py#L1867)).
-After `read` of the same file, it is `'Text'`
-([`Sequence/read_seq.py`, line 100](https://github.com/pulseq/pypulseq/blob/f2c582bae13145b8ac71958726bc8b5a14bd1cfd/src/pypulseq/Sequence/read_seq.py#L100)).
+After `write`, `Sequence.signature_file` is `'text'`:
+
+https://github.com/pulseq/pypulseq/blob/f2c582bae13145b8ac71958726bc8b5a14bd1cfd/src/pypulseq/Sequence/sequence.py#L1865-L1868
+
+After `read` of the same file, it is `'Text'`:
+
+https://github.com/pulseq/pypulseq/blob/f2c582bae13145b8ac71958726bc8b5a14bd1cfd/src/pypulseq/Sequence/read_seq.py#L94-L100
+
 So a check such as `seq.signature_file == 'text'` is false after `read`.
 
 pypulseq follows MATLAB Pulseq here, which has the same `'Text'` in `read.m`, while its
