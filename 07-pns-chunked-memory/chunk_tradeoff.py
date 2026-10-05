@@ -24,7 +24,7 @@ if not hasattr(calc_pns_module, '_PNS_CHUNK_SAMPLES'):
 
 def cpu_name():
     if sys.platform == 'darwin':
-        return subprocess.run(['sysctl', '-n', 'machdep.cpu.brand_string'], capture_output=True, text=True).stdout.strip()
+        return subprocess.run(['sysctl', '-n', 'machdep.cpu.brand_string'], capture_output=True, text=True, check=False).stdout.strip()
     if sys.platform.startswith('linux'):
         with open('/proc/cpuinfo') as f:
             for line in f:
