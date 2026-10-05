@@ -1,7 +1,8 @@
 # Plan: compute the SAFE model in chunks (issue 07)
 
-This plan is for the change in [issue 07](issue.md). The implementation also measures
-the memory and the time. These measurements replace the expected values in issue 07.
+This plan is for the change in issue 07, now part of [issue 06](../06-pns-time-memory/issue.md).
+The implementation also measures the memory and the time. These measurements replace
+the expected values in issue 07.
 
 ## Goal
 

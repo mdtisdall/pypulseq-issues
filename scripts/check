@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# All the checks of this repository, in one command. Run it in the devShell:
+#
+#   nix develop --command scripts/check
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+echo "# ruff"
+# The examples follow pypulseq's style, not ruff format's, so only the linter runs.
+ruff check --extend-exclude .worktrees .
+
+echo
+echo "# links"
+python3 scripts/check_links.py
+
+echo
+echo "# shellcheck"
+shellcheck --severity=warning scripts/check .claude/hooks/block-main-writes.sh
+echo "ok    shellcheck"
