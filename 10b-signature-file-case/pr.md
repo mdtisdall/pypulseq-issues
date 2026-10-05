@@ -1,6 +1,6 @@
 Set `signature_file` to `'text'` in `read`, as `write` does
 
-Closes #XXX
+Closes #427
 
 `read` set `signature_file` to `'Text'`, while `write` sets `'text'`. This changes `read` to `'text'`, as pulseq/pulseq#296 does for MATLAB Pulseq.
 

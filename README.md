@@ -20,7 +20,7 @@ test for the PR that follows the issue.
 | 08 | [`add_block` stores an RF event with `use='other'` as undefined](08-rf-use-other/issue.md) | draft | — | — |
 | 09 | [`read()` stores the `[SIGNATURE]` hash as a float when the hex digest looks like a number](09-signature-hash-as-number/issue.md) ([plan](09-signature-hash-as-number/plan.md)) | draft | [`fix-signature-hash-as-number`](https://github.com/mdtisdall/pypulseq/tree/fix-signature-hash-as-number) | — |
 | 10a | [For `pulseq/pulseq`: `signatureFile` is `'Text'` after `read`, but `'text'` after `write`](10a-signature-file-case/issue.md) | PR open | [`fix-signature-file-case`](https://github.com/mdtisdall/pulseq/tree/fix-signature-file-case) | issue [pulseq/pulseq#295](https://github.com/pulseq/pulseq/issues/295), PR [pulseq/pulseq#296](https://github.com/pulseq/pulseq/pull/296) |
-| 10b | [`read` sets `signature_file` to `'Text'`, but `write` sets `'text'`](10b-signature-file-case/issue.md) | draft | — | — |
+| 10b | [`read` sets `signature_file` to `'Text'`, but `write` sets `'text'`](10b-signature-file-case/issue.md) | PR open | [`fix-signature-file-case`](https://github.com/mdtisdall/pypulseq/tree/fix-signature-file-case) | issue [#427](https://github.com/pulseq/pypulseq/issues/427), PR [#428](https://github.com/pulseq/pypulseq/pull/428) |
 
 ## Layout
 
