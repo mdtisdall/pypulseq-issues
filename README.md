@@ -16,6 +16,8 @@ test for the PR that follows the issue.
 | 05 | [Note for `pulseq/pulseq`: area of an oversampled arbitrary gradient counts only the raster-centre samples](05-oversampled-area/issue.md) | draft | — | — |
 | 06 | [Reduce the time and memory of `calculate_pns` for long sequences](06-pns-time-memory/issue.md) | draft | [`pns-chunked`](https://github.com/mdtisdall/pypulseq/tree/pns-chunked) | — |
 | 07 | Compute the SAFE model of `calculate_pns` in chunks ([plan](07-pns-chunked-memory/plan.md)) | merged into 06 | — | — |
+| 08 | [`add_block` stores an RF event with `use='other'` as undefined](08-rf-use-other/issue.md) | draft | — | — |
+| 09 | [`read()` stores the `[SIGNATURE]` hash as a float when the hex digest looks like a number](09-signature-hash-as-number/issue.md) ([plan](09-signature-hash-as-number/plan.md)) | draft | [`fix-signature-hash-as-number`](https://github.com/mdtisdall/pypulseq/tree/fix-signature-hash-as-number) | — |
 
 ## Layout
 
@@ -28,6 +30,7 @@ Each issue has its own folder:
   checkout with `git apply <path>/fix.diff`.
 - `pr.md`, where there is one: the PR description, ready to paste, with its title in
   the first line.
+- `plan.md`, where there is one: the plan of the implementation of the fix.
 
 07 is merged into 06. Its folder keeps `plan.md`, the plan of the implementation, and
 `chunk_tradeoff.py`, which measures the time and the memory of `calculate_pns` for chunk
@@ -69,4 +72,5 @@ uv run --no-project --with-editable <pypulseq checkout> python 01-oversampled-sl
 Reports 01 to 05 come from a comparison of the gradient slew computations in pypulseq and
 MATLAB Pulseq (September 2026). Reports 06 and 07 come from the work on the PNS card of
 [pulseq-reports](https://github.com/mdtisdall/pulseq-reports) for long sequences
-(September 2026).
+(September 2026). Report 09 comes from the work on the sequence signature in the result
+matrix of [pulseq-checks](https://github.com/mdtisdall/pulseq-checks) (October 2026).

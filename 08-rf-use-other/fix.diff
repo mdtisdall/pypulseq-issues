@@ -1,0 +1,30 @@
+diff --git a/src/pypulseq/Sequence/block.py b/src/pypulseq/Sequence/block.py
+index 9c9cb0f..2f7ca11 100644
+--- a/src/pypulseq/Sequence/block.py
++++ b/src/pypulseq/Sequence/block.py
+@@ -9,7 +9,7 @@ from pypulseq.block_to_events import block_to_events
+ from pypulseq.compress_shape import compress_shape
+ from pypulseq.decompress_shape import decompress_shape
+ from pypulseq.event_lib import EventLibrary
+-from pypulseq.supported_labels_rf_use import get_supported_labels
++from pypulseq.supported_labels_rf_use import get_supported_labels, get_supported_rf_uses
+ from pypulseq.utils.tracing import trace_enabled
+ 
+ 
+@@ -867,13 +867,9 @@ def register_rf_event(self, event: SimpleNamespace) -> Tuple[int, List[int]]:
+ 
+     use = 'u'  # Undefined
+     if hasattr(event, 'use'):
+-        if event.use in [
+-            'excitation',
+-            'refocusing',
+-            'inversion',
+-            'saturation',
+-            'preparation',
+-        ]:
++        # One letter for each supported use: 'e', 'r', 'i', 's', 'p', 'o', and 'u' for
++        # 'undefined'. `Sequence.read` maps the same letters back.
++        if event.use in get_supported_rf_uses():
+             use = event.use[0]
+         else:
+             use = 'u'
