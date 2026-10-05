@@ -41,7 +41,7 @@ strcmp(signatureFile, 'text'): 1 after write, 0 after read
 ```
 
 With `'Text'` changed to `'text'` in `read.m`, line 92, the value is `'text'` in both
-cases.
+cases. I will open a PR with this fix and a test.
 
 Versions: MATLAB Pulseq (`pulseq/pulseq`) master at c746912 (2026-09-17), run in GNU
 Octave 11.3.0.
