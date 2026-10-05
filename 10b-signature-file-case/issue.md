@@ -9,7 +9,7 @@ After `read` of the same file, it is `'Text'`
 So a check such as `seq.signature_file == 'text'` is false after `read`.
 
 pypulseq follows MATLAB Pulseq here, which has the same `'Text'` in `read.m`, while its
-`Sequence.m` documents `'text'` or `'bin'`. I reported that as pulseq/pulseq#XXX.
+`Sequence.m` documents `'text'` or `'bin'`. I reported that as pulseq/pulseq#295.
 
 **To Reproduce**
 
@@ -48,7 +48,7 @@ signature_file == 'text': True after write, False after read
 
 **Expected behavior**
 
-`'text'` after `write` and after `read`, as in the fix proposed in pulseq/pulseq#XXX.
+`'text'` after `write` and after `read`, as in the fix proposed in pulseq/pulseq#296.
 
 **Suggested fix**
 
