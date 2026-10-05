@@ -33,13 +33,13 @@ We use `pulseq-reports-pin`: it is `v1.5.0.post1` with our local fixes.
 | Tracking repository | `/Users/dylan/dev/pypulseq-issues` |
 | Changed source file | `src/pypulseq/Sequence/read_seq.py` (the `[SIGNATURE]` branch of `read`, and `__read_definitions`) |
 | Test file | `tests/test_sequence.py` (decision D2) |
-| Test command | `.venv/bin/python -m pytest tests/test_sequence.py -k signature` in the worktree |
+| Test command | `.venv/bin/python -m pytest tests/test_sequence.py -k "test_read_signature_as_text or test_writeread_signature"` in the worktree. Do not use `-k signature`: it also selects `TestSequence::test_writeread_no_signature`, which fails when it runs without the other tests of its class. |
 | Check command | `.venv/bin/pre-commit run --all-files` and `.venv/bin/python -m pytest` |
 | Parallel tests | Do not use `pytest -n`. Tests in `test_sequence.py` then fail at random, also on `master`. |
 | Release tag | `v1.5.0.post1` |
 | Our branch | `pulseq-reports-pin` (`a74ab06`, also on `origin`). It is `v1.5.0.post1` and 4 commits: the 2 commits of issue 06, the fix of issue 02 (`get_block`), and #359 (no infinite loop for a file without a signature). |
 | Check worktrees | `/Users/dylan/dev/pypulseq/.worktrees/signature-on-1.5.0.post1` (detached at `v1.5.0.post1`) and `/Users/dylan/dev/pypulseq/.worktrees/signature-on-pin` (branch `pulseq-reports-pin-signature`, from `pulseq-reports-pin`) |
-| Check command on 1.5.0.post1 | `.venv/bin/python -m pytest` only. The lint of the change is checked on the fix branch. |
+| Check command on 1.5.0.post1 | `.venv/bin/python -m pytest -W ignore::pytest.PytestRemovedIn10Warning` only. The lint of the change is checked on the fix branch. Without `-W`, pytest 9.1 stops at collection: `tests/test_calc_duration.py` at the tag gives a generator to `parametrize`. |
 
 On `v1.5.0.post1`, `read_seq.py` differs from `master` only in `__read_shapes` (#359).
 On `pulseq-reports-pin`, `read_seq.py` is the same as on `master`. `fix.diff` applies to

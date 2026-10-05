@@ -84,12 +84,40 @@ for each digest. `signature_type` is the text of the `Type` line.
 
 **Suggested fix**
 
-Read the values of `[SIGNATURE]` as text. `fix.diff` adds the argument `numeric=True`
-to `__read_definitions`; the `[SIGNATURE]` branch gives `numeric=False`, and
-`[DEFINITIONS]` does not change. With it, the example prints the hash as a `str` and
-`equal: True`, and the pypulseq test suite gives the same result with and without the
-change (1262 passed, 24 skipped, serial run; the 2 tests of `tests/test_sigpy.py` fail in
-both because sigpy is not installed).
+Read the values of `[SIGNATURE]` as text. Add the argument `numeric=True` to
+`__read_definitions`; the `[SIGNATURE]` branch gives `numeric=False`, and
+`[DEFINITIONS]` does not change:
+
+```diff
+--- a/src/pypulseq/Sequence/read_seq.py
++++ b/src/pypulseq/Sequence/read_seq.py
+@@ -92,7 +92,9 @@ def read(self, path: str, detect_rf_use: Union[bool, None] = None, remove_duplic
+         elif section == '[SIGNATURE]':
+-            temp_sign_defs = __read_definitions(input_file)
++            # The values are text: a hex digest can look like a number (for example
++            # '9731349875117297474679317e925476'), and a float loses it.
++            temp_sign_defs = __read_definitions(input_file, numeric=False)
+             if 'Type' in temp_sign_defs:
+@@ -444,7 +446,7 @@ def l2(s):
+-def __read_definitions(input_file) -> Dict[str, str]:
++def __read_definitions(input_file, numeric: bool = True) -> Dict[str, str]:
+@@ -452,6 +454,9 @@ def __read_definitions(input_file) -> Dict[str, str]:
+     input_file : file object
+         Sequence file.
++    numeric : bool, default=True
++        Convert the values that are numbers to floats. If False, each value is the text
++        after the key.
+@@ -462,6 +467,10 @@ def __read_definitions(input_file) -> Dict[str, str]:
+     while line != -1 and not (line == '' or line[0] == '#'):
+         tok = line.split(' ')
++        if not numeric:
++            definitions[tok[0]] = line[len(tok[0]) + 1 :].strip()
++            line = __strip_line(input_file)
++            continue
+         try:  # Try converting every element into a float
+```
+
+With this change, the example prints the hash as a `str` and `equal: True`.
 
 **Desktop (please complete the following information):**
  - OS: macOS
