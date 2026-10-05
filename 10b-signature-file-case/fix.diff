@@ -1,0 +1,28 @@
+diff --git a/src/pypulseq/Sequence/read_seq.py b/src/pypulseq/Sequence/read_seq.py
+index 50aa78f..8d58701 100644
+--- a/src/pypulseq/Sequence/read_seq.py
++++ b/src/pypulseq/Sequence/read_seq.py
+@@ -97,7 +97,7 @@ def read(self, path: str, detect_rf_use: Union[bool, None] = None, remove_duplic
+                 self.signature_type = temp_sign_defs['Type']
+             if 'Hash' in temp_sign_defs:
+                 self.signature_value = temp_sign_defs['Hash']
+-                self.signature_file = 'Text'
++                self.signature_file = 'text'
+         elif section == '[VERSION]':
+             file_version_major, file_version_minor, file_version_revision = __read_version(input_file)
+             file_version_combined = 1000000 * file_version_major + 1000 * file_version_minor + file_version_revision
+diff --git a/tests/test_sequence.py b/tests/test_sequence.py
+index 5d83dc8..ce24254 100644
+--- a/tests/test_sequence.py
++++ b/tests/test_sequence.py
+@@ -442,6 +442,10 @@ def test_writeread(self, seq_func, tmp_path, compare_seq_file):
+         # Clean up written sequence file
+         output_filename.unlink()
+ 
++        # Test that the signature is described in the same way after write and after read
++        assert seq.signature_file == 'text'
++        assert (seq2.signature_type, seq2.signature_file) == (seq.signature_type, seq.signature_file)
++
+         # Test for approximate equality of all blocks
+         assert list(seq2.block_events.keys()) == list(seq.block_events.keys()), 'Sequence block IDs are not identical'
+         for block_counter in seq.block_events:
