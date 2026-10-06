@@ -27,6 +27,9 @@ longer holds that file:
 A caller that uses `signature_value` to know whether a sequence came from a signed file,
 or to identify the file, gets a wrong answer in both cases.
 
+pypulseq follows MATLAB Pulseq here, which has the same behaviour in `read` and `setBlock`
+(its `readBinary` already resets the three fields). I reported that as pulseq/pulseq#XXX.
+
 **To Reproduce**
 
 ```python
