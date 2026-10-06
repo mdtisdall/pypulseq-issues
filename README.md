@@ -18,7 +18,8 @@ test for the PR that follows the issue.
 | 06 | [Reduce the time and memory of `calculate_pns` for long sequences](06-pns-time-memory/issue.md) | draft | [`pns-chunked`](https://github.com/mdtisdall/pypulseq/tree/pns-chunked) | — |
 | 07 | Compute the SAFE model of `calculate_pns` in chunks ([plan](07-pns-chunked-memory/plan.md)) | merged into 06 | — | — |
 | 08 | [`add_block` stores an RF event with `use='other'` as undefined](08-rf-use-other/issue.md) | draft | — | — |
-| 09 | [`read()` stores the `[SIGNATURE]` hash as a float when the hex digest looks like a number](09-signature-hash-as-number/issue.md) ([plan](09-signature-hash-as-number/plan.md)) | draft | [`fix-signature-hash-as-number`](https://github.com/mdtisdall/pypulseq/tree/fix-signature-hash-as-number) | — |
+| 09a | [For `pulseq/pulseq`: `read` stores the `[SIGNATURE]` hash as a `double` when the hex digest is a finite number](09a-signature-hash-as-number/issue.md) | draft | — | — |
+| 09b | [`read()` stores the `[SIGNATURE]` hash as a float when the hex digest looks like a number](09b-signature-hash-as-number/issue.md) ([plan](09b-signature-hash-as-number/plan.md)) | draft, after 09a | [`fix-signature-hash-as-number`](https://github.com/mdtisdall/pypulseq/tree/fix-signature-hash-as-number) | — |
 | 10a | [For `pulseq/pulseq`: `signatureFile` is `'Text'` after `read`, but `'text'` after `write`](10a-signature-file-case/issue.md) | PR open | [`fix-signature-file-case`](https://github.com/mdtisdall/pulseq/tree/fix-signature-file-case) | issue [pulseq/pulseq#295](https://github.com/pulseq/pulseq/issues/295), PR [pulseq/pulseq#296](https://github.com/pulseq/pulseq/pull/296) |
 | 10b | [`read` sets `signature_file` to `'Text'`, but `write` sets `'text'`](10b-signature-file-case/issue.md) | PR open | [`fix-signature-file-case`](https://github.com/mdtisdall/pypulseq/tree/fix-signature-file-case) | issue [#427](https://github.com/pulseq/pypulseq/issues/427), PR [#428](https://github.com/pulseq/pypulseq/pull/428) |
 | 11a | [For `pulseq/pulseq`: `signatureValue` is kept after `addBlock`, and after `read` of a file with no `[SIGNATURE]`](11a-stale-signature/issue.md) | draft | — | — |
@@ -41,10 +42,9 @@ Each issue has its own folder:
 `chunk_tradeoff.py`, which measures the time and the memory of `calculate_pns` for chunk
 sizes on one computer. `chunk_tradeoff_m1max.txt` is its output on an Apple M1 Max. A note
 for `pulseq/pulseq` has `repro.m` (MATLAB) as its example. 05 also has `repro.py`, the
-same example in pypulseq, and no `fix.diff`. 10a and 10b, and 11a and 11b, are each the
-same bug in MATLAB Pulseq and in pypulseq: the "a" issue is submitted first, and the "b"
-issue refers to it. The `fix.diff` of 10a, with
-a test, is against `pulseq/pulseq` at `c746912` and applies in a `pulseq/pulseq` checkout.
+same example in pypulseq, and no `fix.diff`. 09a and 09b, 10a and 10b, and 11a and 11b,
+are each the same bug in MATLAB Pulseq and in pypulseq: the "a" issue is submitted first,
+and the "b" issue refers to it. The `fix.diff` of 10a, with a test, is against `pulseq/pulseq` at `c746912` and applies in a `pulseq/pulseq` checkout.
 
 ## Running an example
 
