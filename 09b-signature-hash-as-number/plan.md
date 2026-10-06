@@ -56,7 +56,7 @@ Make these decisions before Phase 0 starts. Each decision has a recommendation.
 | D1 | How does the reader keep the text? (a) An argument `numeric=True` on `__read_definitions`; the `[SIGNATURE]` branch gives `numeric=False`. (b) A new function `__read_signature`. | (a). It is the change that the issue proposes, and it is the smallest diff. It adds no public API: `__read_definitions` is private to the module. |
 | D2 | Where does the test go? (a) A module-level function in `tests/test_sequence.py`, after `class TestSequence`. (b) A new file `tests/test_read_seq.py`. | (a). `test_sequence.py` has the write and read tests, also `test_writeread_no_signature`. A function outside the class does not run once for each sequence of `sequence_zoo`. |
 | D3 | How does the test make a file with a float-like digest? (a) Write the file with `create_signature=False`, then append a `[SIGNATURE]` section in the format of `write_seq.py`. (b) Patch `hashlib.md5` so that `write` writes a chosen digest. (c) Search for a definition value, as the first version of `repro.py` did. | (a). It is fast and gives the same file each time. `read` does not check the hash, so a hash that is not the MD5 of the file is correct for this test. (b) depends on how `write_seq.py` calls `hashlib`. (c) needs about 850,000 MD5 calculations on average, and its value changes when the output of `write` changes (for example the version lines). |
-| D4 | MATLAB Pulseq has the same pattern for 32-digit digests and small exponents. Does it get its own note for `pulseq/pulseq`, as issue 05 does? | Not in this plan. Issue 09 already names it in "Additional context". If you want a note, it is issue 10, with a `repro.m`. |
+| D4 | MATLAB Pulseq has the same pattern for 32-digit digests and small exponents. Does it get its own note for `pulseq/pulseq`, as issue 05 does? | Not in this plan. Issue 09 already names it in "Additional context". If you want a note, it is issue 10, with a `repro.m`. Later: the note is [09a](../09a-signature-hash-as-number/issue.md), and this issue became 09b, which refers to it. |
 | D5 | The "Suggested fix" of `issue.md` names `fix.diff` and gives the test-suite result. The style of the issues is: self-contained, and no test-suite results (they are CI results for the PR). Issue 08 has the same two items. | Change issue 09 in Phase 3: put the diff of `src/` in the issue as a `diff` block, and remove the test-suite sentence. Keep the result of the example with the fix. Do the same for issue 08 in a separate task. |
 | D6 | Who opens the issue and the PR upstream? | You. The main agent pushes the branch to the fork only and writes `pr.md`. The PR body has `Closes #N`; you set `N` after you submit the issue. |
 | D7 | After the checks of Phase 2 pass, does the fix go on `pulseq-reports-pin`? | Yes, as the fix of issue 02 did (`8c089a1`). Task 2.2 cherry-picks the commit with `git cherry-pick -x` and keeps the message, as `8c089a1` does. Fast-forward `pulseq-reports-pin` to that commit. Push it to `origin` only after you agree. |
@@ -103,7 +103,7 @@ PR title: "Read the `[SIGNATURE]` values of a `.seq` file as text".
 |---|---|
 | 1.1 Write the tests first | 1.1.1 Add the two tests of "Test cases" (decision D2, decision D3). Use `tmp_path`. |
 | | 1.1.2 Run the test command on the unchanged code. The 4 float-like digests must fail; the normal digest and the round trip must pass. If not, find the cause before 1.2. |
-| 1.2 Write the fix | 1.2.1 Apply `09-signature-hash-as-number/fix.diff` with `git apply`. If it does not apply, make the same change by hand (decision D1). |
+| 1.2 Write the fix | 1.2.1 Apply `09b-signature-hash-as-number/fix.diff` with `git apply`. If it does not apply, make the same change by hand (decision D1). |
 | | 1.2.2 Correct the docstring of `__read_definitions` only where `fix.diff` changes it. Do not correct other typos in the file: they are a different change. |
 | 1.3 Check and commit | 1.3.1 Run the test command. All cases must pass. |
 | | 1.3.2 Run the check command. Compare with 0.2.3: the only difference must be the new tests. |
@@ -124,7 +124,7 @@ and tell the user: the upstream commit and our commit must stay the same change.
 | | 2.1.3 `git cherry-pick --no-commit fix-signature-hash-as-number`. If `tests/test_sequence.py` has a conflict, keep the tag's version of the file and add the two new tests at the end of it. `read_seq.py` must not have a conflict. |
 | | 2.1.4 Run the test command. All cases must pass. |
 | | 2.1.5 Run `.venv/bin/python -m pytest`. Compare with 2.1.2: the only difference must be the new tests. |
-| | 2.1.6 Run `repro.py` with `uv run --no-project --with-editable <this worktree> python 09-signature-hash-as-number/repro.py`. It must print the hash as a `str` and `equal: True`. |
+| | 2.1.6 Run `repro.py` with `uv run --no-project --with-editable <this worktree> python 09b-signature-hash-as-number/repro.py`. It must print the hash as a `str` and `equal: True`. |
 | | 2.1.7 Remove the worktree. Nothing in it is kept. |
 | 2.2 Check on `pulseq-reports-pin` | 2.2.1 `git worktree add -b pulseq-reports-pin-signature .worktrees/signature-on-pin pulseq-reports-pin`. Create `.venv` and install `-e '.[test]'`. |
 | | 2.2.2 Run `.venv/bin/python -m pytest` before the change. Record the result. |
@@ -138,7 +138,7 @@ Do this phase on a new docs branch of the tracking repository.
 
 | Task | Sub-task |
 |---|---|
-| 3.1 Validate the example | 3.1.1 Run `repro.py` with `uv run --no-project --with-editable <fix worktree> python 09-signature-hash-as-number/repro.py`. It must print the hash as a `str` and `equal: True`. |
+| 3.1 Validate the example | 3.1.1 Run `repro.py` with `uv run --no-project --with-editable <fix worktree> python 09b-signature-hash-as-number/repro.py`. It must print the hash as a `str` and `equal: True`. |
 | 3.2 Update the files | 3.2.1 Write `fix.diff` again: `git diff upstream/master fix-signature-hash-as-number -- src`. The other `fix.diff` files do not include tests. If it differs from the current file, use the new one. |
 | | 3.2.2 Write `pr.md` in the style of the PRs that close an issue: the title on the first line, `Closes #N`, one or two sentences, a short list of changes, no test results, and the Claude note at the end. |
 | | 3.2.3 Change the "Suggested fix" of `issue.md` (decision D5). The "Desktop" section already says that the example gives the same output with 1.5.0.post1 and with `master`. Keep that sentence only if 2.1.6 confirms it with the fix. |
