@@ -25,6 +25,7 @@ test for the PR that follows the issue.
 | 11a | [For `pulseq/pulseq`: `signatureValue` is kept after `addBlock`, and after `read` of a file with no `[SIGNATURE]`](11a-stale-signature/issue.md) | draft | — | — |
 | 11b | [`Sequence` keeps the `[SIGNATURE]` hash of a file after `add_block` and after `read` of an unsigned file](11b-stale-signature/issue.md) | draft, after 11a | — | — |
 | 12 | [`waveforms()` draws a line across a gap between two gradient events, where MATLAB Pulseq ramps to 0](12-gradient-gap-model/issue.md) | draft | — | — |
+| 13 | [Note for `pulseq/pulseq`: the prose of five sections of the specification disagrees with their tables and examples](13-spec-prose-vs-tables/issue.md) | draft | — | — |
 
 ## Layout
 
@@ -44,7 +45,8 @@ Each issue has its own folder:
 sizes on one computer. `chunk_tradeoff_m1max.txt` is its output on an Apple M1 Max. A note
 for `pulseq/pulseq` has `repro.m` (MATLAB) as its example. 05 also has `repro.py`, the
 same example in pypulseq, and no `fix.diff`. 12 has `repro.m` too, the same sequences in
-MATLAB Pulseq, for comparison. 09a and 09b, 10a and 10b, and 11a and 11b,
+MATLAB Pulseq, for comparison. 13 has only `issue.md`: it is about the text of the
+specification, so it has no example. 09a and 09b, 10a and 10b, and 11a and 11b,
 are each the same bug in MATLAB Pulseq and in pypulseq: the "a" issue is submitted first,
 and the "b" issue refers to it. The `fix.diff` of 10a, with a test, is against `pulseq/pulseq` at `c746912` and applies in a `pulseq/pulseq` checkout.
 
@@ -89,3 +91,5 @@ Report 11 comes from the work on
 with no `[SIGNATURE]` hash (October 2026).
 Report 12 comes from a code review of pulseq-analysis, which found that its measurements
 used different gradients between two events (October 2026).
+Report 13 comes from the study of a strict parser of Pulseq files for pulseq-analysis
+(October 2026).
