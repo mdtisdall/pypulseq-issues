@@ -26,6 +26,7 @@ test for the PR that follows the issue.
 | 11b | [`Sequence` keeps the `[SIGNATURE]` hash of a file after `add_block` and after `read` of an unsigned file](11b-stale-signature/issue.md) | draft, after 11a | — | — |
 | 12 | [`waveforms()` draws a line across a gap between two gradient events, where MATLAB Pulseq ramps to 0](12-gradient-gap-model/issue.md) | draft | — | — |
 | 13 | [Note for `pulseq/pulseq`: the prose of five sections of the specification disagrees with their tables and examples](13-spec-prose-vs-tables/issue.md) | draft | — | — |
+| 15 | [`write()` fails with `KeyError` after `read()` of a file older than 1.5 with RF events](15-rf-1-4-write-keyerror/issue.md) | draft | — | — |
 
 ## Layout
 
@@ -93,3 +94,6 @@ Report 12 comes from a code review of pulseq-analysis, which found that its meas
 used different gradients between two events (October 2026).
 Report 13 comes from the study of a strict parser of Pulseq files for pulseq-analysis
 (October 2026).
+Report 15 comes from batch 4 of
+[pulseq-discrepancies](https://github.com/mdtisdall/pulseq-discrepancies) (record
+DIS-0062), and was checked on pypulseq master at `c977214` (October 2026).
